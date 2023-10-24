@@ -1,0 +1,62 @@
+title: "spaCy Transformer POS/Lemmatizer/NER pipeline"
+
+# Variables can be referenced across the project.yml using ${vars.var_name}
+vars:
+  config: "default"
+  # Set to '0' to use the GPU; '-1' uses the CPU.
+  gpu: 0
+  # Seed for the RNG.
+  seed: 1
+  # Percentages used to split the corpus into training, development and test datasets.
+  splits: "80|10|10"
+  # Maximum number of corpus documents we want to convert.
+  n_docs: 5000
+
+# These are the directories that the project needs. The project CLI will make
+# sure that they always exist.
+directories: ["assets", "training", "configs", "metrics", "corpus"]
+
+assets:
+  - dest: "assets/gmb.zip"
+    url: "https://gmb.let.rug.nl/releases/gmb-2.2.0.zip"
+    checksum: "7b12fd710826d5a4963e57a43100f6c6"
+
+workflows:
+  all:
+    - corpus
+    - train
+    - evaluate
+
+commands:
+  - name: corpus
+    help: "Convert the data to spaCy's format"
+    script:
+      - 'unzip assets/gmb.zip "*.tags" -d assets/'
+      - "python scripts/gmb_converter.py assets/gmb-2.2.0 corpus --seed ${vars.seed} --splits '${vars.splits}' --n-docs ${vars.n_docs}"
+    deps:
+      - "assets/gmb.zip"
+    outputs:
+      - "corpus/train.spacy"
+      - "corpus/dev.spacy"
+      - "corpus/test.spacy"
+
+  - name: train
+    help: "Train the full pipeline"
+    script:
+      - "python -m spacy train configs/${vars.config}.cfg -o training/ --gpu-id ${vars.gpu} --paths.train corpus/train.spacy --paths.dev corpus/dev.spacy"
+    deps:
+      - "corpus/train.spacy"
+      - "corpus/dev.spacy"
+      - "configs/${vars.config}.cfg"
+    outputs:
+      - "training/model-best"
+
+  - name: evaluate
+    help: "Evaluate on the test data and save the metrics"
+    script:
+      - "python -m spacy evaluate ./training/model-best ./corpus/test.spacy --output ./metrics/${vars.config}.json --gpu-id ${vars.gpu}"
+    deps:
+      - "training/model-best"
+      - "corpus/test.spacy"
+    outputs:
+      - "metrics/${vars.config}.json"
