@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "entities"
+version = "0.1.0"
+description = ""
+authors = ["Daniël de Kok <me@danieldk.eu>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+en-core-web-trf = {url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_trf-3.7.2/en_core_web_trf-3.7.2-py3-none-any.whl"}
+fastapi = "^0.104.1"
+pydantic = "^2.4.2"
+spacy = "^3.7.2"
+thinc-apple-ops = { version = "^0.1.4", markers = "sys_platform == 'darwin'" }
+uvicorn = {extras = ["standard"], version = "^0.23.2"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
