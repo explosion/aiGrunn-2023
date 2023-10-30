@@ -11,16 +11,16 @@ app = FastAPI()
 
 
 @dataclass
+class Token:
+    text: str
+    lemma: str
+
+
+@dataclass
 class Span:
     text: str
     label: str
     span: Tuple[int, int]
-
-
-@dataclass
-class Token:
-    text: str
-    lemma: str
 
 
 @dataclass
@@ -29,7 +29,7 @@ class Annotations:
     entities: List[Span]
 
 
-def convert_spacy_doc(doc: spacy.tokens.Doc):
+def convert_spacy_doc(doc: Doc):
     tokens = [Token(text=token.text, lemma=token.lemma_) for token in doc]
     entities = [
         Span(text=ent.text, label=ent.label_, span=(ent.start, ent.end))
