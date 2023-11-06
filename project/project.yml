@@ -20,6 +20,7 @@ assets:
   - dest: "assets/gmb.zip"
     url: "https://gmb.let.rug.nl/releases/gmb-2.2.0.zip"
     checksum: "7b12fd710826d5a4963e57a43100f6c6"
+    description: "Compressed Groningen Meaning Bank corpus"
 
 workflows:
   all:
